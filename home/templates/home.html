@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HOTEL SEARCH</title>
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js"
+         integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+            
+</head>
+
+<body>
+    <style>
+        body {
+          background-image: url('https://images.unsplash.com/photo-1445019980597-93fa8acb246c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1174&q=80');
+        }
+        </style>
+    <nav>
+        <div class="nav-wrapper">
+            <a href="#" class="brand-logo">HOTEL SEARCH</a>
+        </div>
+    </nav>
+
+    <div class="container m4" style="margin-top: 10px;">
+        <div class="row">
+            <div class="col m5">
+                <div class="input-field col s12">
+                    <select multiple id="emenities" onchange="getHotels()" >
+                        <option value="" disabled selected><b>CHOOSE YOUR OPTION</b></option>
+                        {% for emenitie in emenities %}
+                        <option value="{{emenitie.id}}">{{emenitie.name}}</option>
+
+                        {% endfor %}
+                    </select>
+                    <label><b>SELECTED EMENITIES</b></label>
+                </div>
+            </div>
+            <div class="col m4">
+                <label><b>HOTEL PRICE</b></label>
+
+                <p class="range-field">
+                    <input type="range" onchange="getHotels()" id="price" min="2000" max="10000" value="10000" />
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="container">
+        <div class="row m5 p5" id="show_hotels_here">
+
+        </div>
+    </div>
+
+
+    <script>
+
+        var show_hotels_here = document.getElementById("show_hotels_here")
+        $(document).ready(function() {
+            $('select').formSelect();
+        });
+
+            
+        function getHotels() {
+            var price = document.getElementById('price')
+            var instance = M.FormSelect.getInstance(document.getElementById('emenities'))
+            emenities = ''
+            var html = ''
+            if (instance) {
+                emenities = (instance.getSelectedValues())
+            } 
+             
+            fetch(`/api/hotels?emenities=${emenities}&price=${price.value}`)
+                .then(result => result.json())
+                .then(response => {
+                    for (var i = 0; i < response.length; i++) {
+                        html += `<div class="col s3 m3">
+                    <div class="card">
+    <div class="card-image">
+        <img src="${response[i].hotel_image}">
+      <span class="<b>card-title</b>">${response[i].hotel_name}</span>
+    </div>
+    <div class="card-content">
+        Price - <span class="new  badge">${response[i].hotel_price}</span>
+         <p>${(response[i].hotel_description).substring(0 , 100)}</p>
+    </div>
+               
+</div>
+</div>`
+                    }
+                    show_hotels_here.innerHTML = html
+                })
+    }
+               
+                    
+               
+            
+
+        
+        getHotels()
+    
+    </script>
+
+
+</body>
+
